@@ -8,6 +8,7 @@ require 'json'
 require 'sinatra/activerecord'
 require './environments'
 require_all './models'
+require_all './services'
 
 Dotenv.load
 
@@ -34,17 +35,13 @@ post '/fbwebhooks' do
     json["entry"].each do |entry|
       entry["messaging"].each do |message|
         recipient = message["sender"]
-        write_a_message(recipient, "you said #{message["message"]["text"]}")
+        message_text = message["message"]["text"]
+
+        FacebookResponse.new(recipient, message: message_text).send!
       end
     end
 
     status 201
     body ''
   end
-end
-
-def write_a_message(recipient, message)
-  Unirest.post "https://graph.facebook.com/v2.6/me/messages?access_token=#{ENV['PAGE_ACCESS_TOKEN']}",
-               headers: { "Content-Type" => "application/json" },
-               parameters: { recipient: recipient, message: { text: message } } { |r| }
 end
