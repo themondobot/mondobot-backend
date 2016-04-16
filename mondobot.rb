@@ -1,8 +1,13 @@
+require 'require_all'
 require 'sinatra'
 require 'pry'
 require 'json'
 require 'unirest'
 require 'dotenv'
+require 'json'
+require 'sinatra/activerecord'
+require './environments'
+require_all './models'
 
 Dotenv.load
 
@@ -12,6 +17,12 @@ get '/fbwebhooks' do
   else
     "Error, wrong validation token"
   end
+end
+
+get "/users" do
+  content_type :json
+  @users = User.all
+  @users.to_json
 end
 
 post '/fbwebhooks' do
