@@ -1,5 +1,9 @@
+require 'unirest'
+
 class FacebookResponse
   attr_accessor :recipient, :message
+
+  TEST_IMAGE = "https://45.media.tumblr.com/cfd039730669f89c064f69e57e0877af/tumblr_nj6ipiNACJ1t8s6eeo1_500.gif"
 
   def initialize(recipient, message: nil)
     self.recipient = recipient
@@ -12,8 +16,12 @@ class FacebookResponse
     responses << text_response("Hello!") if greeting?
     responses << text_response(":)") if greeting?
 
+    if test?
+      responses << multiple_choice_response("blah", ["Test 1", "Test 2", "Test 3"])
+    end
+
     if message.length < 1
-      responses << image_response("https://45.media.tumblr.com/cfd039730669f89c064f69e57e0877af/tumblr_nj6ipiNACJ1t8s6eeo1_500.gif")
+      responses << image_response(TEST_IMAGE)
     end
 
     responses
@@ -21,9 +29,15 @@ class FacebookResponse
 
   def send!
     responses.each do |response|
+      payload = { recipient: recipient, message: response }
+
+      puts "---------sending payload"
+      puts payload
+      puts "---------"
+
       Unirest.post "https://graph.facebook.com/v2.6/me/messages?access_token=#{ENV['PAGE_ACCESS_TOKEN']}",
                    headers: { "Content-Type" => "application/json" },
-                   parameters: { recipient: recipient, message: response } do |r|
+                   parameters: payload.to_json do |r|
         puts "SEND #{r.code} -- #{r.body}"
       end
     end
@@ -46,6 +60,38 @@ class FacebookResponse
         }
       }
     }
+  end
+
+  def multiple_choice_response(message, choices, images=[])
+    elements = choices.map do |choice|
+      {
+        title: choice.to_s,
+        image_url: TEST_IMAGE,
+        subtitle: "test",
+        buttons: [
+          {
+            type: :web_url,
+            url: "https://google.com",
+            title: "Google"
+          }
+        ]
+      }
+    end
+
+    {
+      attachment: {
+        type: :template,
+        payload: {
+          template_type: :generic,
+          # text: message,
+          elements: elements
+        }
+      }
+    }
+  end
+
+  def test?
+    message.split(/\W+/).include?("test")
   end
 
   def greeting?
