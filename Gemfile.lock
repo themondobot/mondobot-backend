@@ -1,20 +1,34 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.3.8)
+    byebug (8.2.4)
+    dotenv (2.1.1)
+    json (1.8.3)
+    mime-types (1.25.1)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
+    rest-client (1.6.9)
+      mime-types (~> 1.16)
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
     tilt (2.0.2)
+    unirest (1.1.2)
+      addressable (~> 2.3.5)
+      json (~> 1.8.1)
+      rest-client (~> 1.6.7)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  byebug
+  dotenv
   sinatra
+  unirest
 
 BUNDLED WITH
    1.11.2
