@@ -28,15 +28,15 @@ class FacebookResponse
       responses << text_response("Your balance is #{balance.format}")
     end
 
-    if message.length < 1
-      responses << image_response(TEST_IMAGE)
-    end
-
     if unauthorized?
       puts "UNAUTHROZIED"
       responses << link_to_mondo_auth
     else
       puts "authed!"
+    end
+
+    if responses.length < 1
+      responses << image_response(TEST_IMAGE)
     end
 
     responses
