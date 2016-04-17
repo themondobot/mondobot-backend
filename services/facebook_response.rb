@@ -20,7 +20,7 @@ class FacebookResponse
     responses << text_response("Hello!") if greeting?
     responses << text_response(":)") if greeting?
 
-    if message_words.include?("here") do
+    if message_words.include?("here")
       responses << text_response("if you want to specify a place, send your location")
     end
 
