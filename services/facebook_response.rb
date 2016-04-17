@@ -95,7 +95,7 @@ class FacebookResponse
 
   def format_transactions(transactions)
     transaction_tiles = []
-    transactions.each do |transaction|
+    transactions[0..9].each do |transaction|
       image = transaction.merchant.try(:logo).to_s
       element = {
         title: transaction.merchant.try(:name) || transaction.description,
