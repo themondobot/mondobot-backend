@@ -20,6 +20,10 @@ class FacebookResponse
     responses << text_response("Hello!") if greeting?
     responses << text_response(":)") if greeting?
 
+    if message_words.include?("here") do
+      responses << text_response("if you want to specify a place, send your location")
+    end
+
     if transaction_params = get_transaction_details
       transactions = GetTransactions.new(get_client, transaction_params).execute
       responses << format_transactions(transactions)
