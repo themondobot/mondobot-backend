@@ -175,9 +175,13 @@ class FacebookResponse
     message.split(/\W+/).include?("test")
   end
 
+  def message_words
+    message.split(/\W+/)
+  end
+
   def greeting?
     ["hello", "hey", "sup", "lo", "hi"].each do |greeting|
-      if message.split(/\W+/).include?(greeting)
+      if message_words.include?(greeting)
         return true
       end
     end
@@ -185,14 +189,24 @@ class FacebookResponse
   end
 
   def get_transaction_details
-    return false unless message.include? "transactions"
+    return false unless message_words.include? "transactions"
     params = {}
-    params[:date] = Date.yesterday if message.include? "yesterday"
-    params[:date] = Date.today if message.include? "today"
+    params[:date] = Date.yesterday if message_words.include? "yesterday"
+    params[:date] = Date.today if message_words.include? "today"
     unless attachment.nil?
       params[:latitude] = attachment.try(:[], "payload").try(:[], "latitude")
       params[:longitude] = attachment.try(:[], "payload").try(:[], "longitude")
     end
+
+    words = message_words
+    words.delete("yesterday")
+    words.delete("today")
+
+
+    # "blah blah transactions blah at starbucks".match(/(at|in) (.*)/)[2]
+    # => "starbucks"
+    params[:merchant_name] = words.join(" ").match(/(at|in) (.*)/).try(:[], 2)
+
     params
   end
 
