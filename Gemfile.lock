@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/themondobot/mondo-ruby
-  revision: 804b9f5d8b9b3abec53ca32a57d42887d93c0df8
+  revision: 7e814109f54bc4801bad9543e8152745524ffc46
   specs:
     mondo (0.6.0)
       geocoder
