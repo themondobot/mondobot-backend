@@ -50,7 +50,7 @@ post '/fbwebhooks' do
         message_text = message["message"]["text"]
         attachments = message["attachments"]
 
-        FacebookResponse.new(recipient, message: message_text, attachment: attachments).send!
+        FacebookResponse.new(recipient, message: message_text, attachments: attachments).send!
       end
     end
 

@@ -8,7 +8,7 @@ class FacebookResponse
   def initialize(recipient, message: nil, attachments: nil)
     self.recipient = recipient
     self.message = message.to_s.downcase
-    self.attachment = attachments.size ? attachments[0] : nil
+    self.attachment = attachments.try(:[], 0)
   end
 
   def responses
@@ -205,7 +205,7 @@ class FacebookResponse
 
   def get_client
     return @client if @client
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaSI6Im9hdXRoY2xpZW50XzAwMDA5NFB2SU5ER3pUM2s2dHo4anAiLCJleHAiOjE0NjEwMDk3NTcsImlhdCI6MTQ2MDgzNjk1NywianRpIjoidG9rXzAwMDA5N0djTldoUmRmN0NBZUFvbWYiLCJ1aSI6InVzZXJfMDAwMDk3RnBKcTE0eXhsdTdJMkRiZCIsInYiOiI0In0.HVkL8v5UHn8Ymn6YCNSwEqQJbrIxScAsZXqYeQwLm64"
+    token = ENV['MONDO_ACCESS_TOKEN']
     account_id = "acc_000097FqTUdHRQwns220cz"
     @client = Mondo::Client.new(token: token, account_id: account_id)
     @client.api_url = "https://staging-api.gmon.io"
