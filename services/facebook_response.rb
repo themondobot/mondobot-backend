@@ -1,13 +1,14 @@
 require 'unirest'
 
 class FacebookResponse
-  attr_accessor :recipient, :message
+  attr_accessor :recipient, :message, :attachment
 
   TEST_IMAGE = "https://45.media.tumblr.com/cfd039730669f89c064f69e57e0877af/tumblr_nj6ipiNACJ1t8s6eeo1_500.gif"
 
-  def initialize(recipient, message: nil)
+  def initialize(recipient, message: nil, attachments: nil)
     self.recipient = recipient
     self.message = message.to_s.downcase
+    self.attachment = attachments.size ? attachments[0] : nil
   end
 
   def responses
@@ -91,10 +92,11 @@ class FacebookResponse
   def format_transactions(transactions)
     transaction_tiles = []
     transactions.each do |transaction|
+      image = transaction.merchant.try(:logo).to_s
       element = {
         title: transaction.merchant.try(:name) || transaction.description,
         subtitle: transaction.amount.format,
-        image: transaction.merchant.try(:logo) || 'https://getmondo.co.uk/static/images/mondo-mark-01.png'
+        image:  image.size ? image : 'https://getmondo.co.uk/static/images/mondo-mark-01.png'
       }
       transaction_tiles << create_element_for_list(element)
     end
@@ -186,6 +188,10 @@ class FacebookResponse
     params = {}
     params[:date] = Date.yesterday if message.include? "yesterday"
     params[:date] = Date.today if message.include? "today"
+    unless attachment.nil?
+      params[:latitude] = attachment.try(:[], "payload").try(:[], "latitude")
+      params[:longitude] = attachment.try(:[], "payload").try(:[], "longitude")
+    end
     params
   end
 

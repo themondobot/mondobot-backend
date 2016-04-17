@@ -48,8 +48,9 @@ post '/fbwebhooks' do
       entry["messaging"].each do |message|
         recipient = message["sender"]
         message_text = message["message"]["text"]
+        attachments = message["attachments"]
 
-        FacebookResponse.new(recipient, message: message_text).send!
+        FacebookResponse.new(recipient, message: message_text, attachment: attachments).send!
       end
     end
 
