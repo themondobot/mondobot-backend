@@ -16,8 +16,14 @@ class FacebookResponse
     responses << text_response("Hello!") if greeting?
     responses << text_response(":)") if greeting?
 
-    if test?
-      responses << multiple_choice_response("blah", ["Test 1", "Test 2", "Test 3"])
+    if transaction_params = get_transaction_details
+      transactions = GetTransactions.new(get_client, transaction_params).execute
+      responses << format_transactions(transactions)
+    end
+
+    if get_balance?
+      balance = GetBalance.new(get_client).execute
+      responses << text_response("Your balance is #{balance.format}")
     end
 
     if message.length < 1
@@ -30,7 +36,6 @@ class FacebookResponse
     else
       puts "authed!"
     end
-
 
     responses
   end
@@ -83,22 +88,37 @@ class FacebookResponse
     }
   end
 
-  def multiple_choice_response(message, choices, images=[])
-    elements = choices.map do |choice|
-      {
-        title: choice.to_s,
-        image_url: TEST_IMAGE,
-        subtitle: "test",
-        buttons: [
-          {
-            type: :web_url,
-            url: "https://google.com",
-            title: "Google"
-          }
-        ]
+  def format_transactions(transactions)
+    transaction_tiles = []
+    transactions.each do |transaction|
+      element = {
+        title: transaction.merchant.try(:name) || transaction.description,
+        subtitle: transaction.amount.format,
+        image: transaction.merchant.try(:logo)
       }
+      transaction_tiles << create_element_for_list(element)
     end
+    format_elements transaction_tiles
+  end
 
+  def create_element_for_list(element)
+    tile = {
+      title: element[:title],
+      subtitle: element[:subtitle],
+      buttons: []
+    }
+    tile[:image_url] = element[:image] if element[:image]
+    element[:buttons].to_a.each do |button|
+      tile[:buttons] << {
+          type: :web_url,
+          url: button.url,
+          title: button.title
+        }
+    end
+    tile
+  end
+
+  def format_elements(elements)
     {
       attachment: {
         type: :template,
@@ -158,7 +178,28 @@ class FacebookResponse
     false
   end
 
+  def get_transaction_details
+    return false unless message.include? "transactions"
+    params = {}
+    params[:date] = Date.yesterday if message.include? "yesterday"
+    params[:date] = Date.today if message.include? "today"
+    params
+  end
+
+  def get_balance?
+    message.include? "balance"
+  end
+
   def message_handler
     @handler ||= MessageHandler.new
+  end
+
+  def get_client
+    return @client if @client
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaSI6Im9hdXRoY2xpZW50XzAwMDA5NFB2SU5ER3pUM2s2dHo4anAiLCJleHAiOjE0NjEwMDk3NTcsImlhdCI6MTQ2MDgzNjk1NywianRpIjoidG9rXzAwMDA5N0djTldoUmRmN0NBZUFvbWYiLCJ1aSI6InVzZXJfMDAwMDk3RnBKcTE0eXhsdTdJMkRiZCIsInYiOiI0In0.HVkL8v5UHn8Ymn6YCNSwEqQJbrIxScAsZXqYeQwLm64"
+    account_id = "acc_000097FqTUdHRQwns220cz"
+    @client = Mondo::Client.new(token: token, account_id: account_id)
+    @client.api_url = "https://staging-api.gmon.io"
+    @client
   end
 end

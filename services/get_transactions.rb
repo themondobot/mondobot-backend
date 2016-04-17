@@ -1,17 +1,23 @@
-require 'byebug'
-
 class GetTransactions
-  attr_reader :facebook_token, :params
+  attr_reader :client,
+              :params
 
-  def initialize(facebook_token, params)
-    @facebook_token = facebook_token
+  def initialize(client, params)
+    @client = client
     @params = params
-    execute
   end
 
-  private
-
   def execute
-
+    transactions = @client.transactions
+    if params[:latitude] && params[:longitude]
+      transactions = Mondo::Transaction.search_by_location(transactions, params[:latitude], params[:longitude], 10)
+    end
+    if params[:date]
+      transactions = Mondo::Transaction.search_by_date(transactions, params[:date])
+    end
+    if params[:merchant_name]
+      transactions = Mondo::Transaction.search_by_merchant(transactions, params[:merchant_name])
+    end
+    transactions
   end
 end
