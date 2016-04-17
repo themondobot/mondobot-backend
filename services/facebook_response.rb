@@ -24,6 +24,14 @@ class FacebookResponse
       responses << image_response(TEST_IMAGE)
     end
 
+    if unauthorized?
+      puts "UNAUTHROZIED"
+      responses << link_to_mondo_auth
+    else
+      puts "authed!"
+    end
+
+
     responses
   end
 
@@ -62,6 +70,19 @@ class FacebookResponse
     }
   end
 
+  def button_response(title, buttons=[])
+    {
+      attachment: {
+        type: :template,
+        payload: {
+          template_type: :button,
+          text: title,
+          buttons: buttons
+        }
+      }
+    }
+  end
+
   def multiple_choice_response(message, choices, images=[])
     elements = choices.map do |choice|
       {
@@ -88,6 +109,40 @@ class FacebookResponse
         }
       }
     }
+  end
+
+  def link_to_mondo_auth
+    url = [
+      "#{ENV['MONDO_AUTH_URL']}/?",
+      "client_id=#{ENV['MONDO_CLIENT_ID']}&",
+      "redirect_uri=#{ENV['HOST']}/mondo_callback&",
+      "response_type=code&"
+    ].join("")
+
+    button_response(
+      "You need to authorize with Mondo so I can access your account!",
+      [
+        {
+          type: :web_url,
+          title: "Authorize",
+          url: url
+        }
+      ]
+    )
+  end
+
+  def unauthorized?
+    !authorized?
+  end
+
+  def authorized?
+    user = User.find_by(facebook_token: facebook_token)
+    return false unless user.present?
+    user.mondo_token.present?
+  end
+
+  def facebook_token
+    recipient["id"]
   end
 
   def test?

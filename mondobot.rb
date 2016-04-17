@@ -25,6 +25,14 @@ get "/users" do
   @users.to_json
 end
 
+get "/mondo_callback" do
+  puts "MONDO CALLBACK --------------------------------------------"
+  puts request.body.read
+  request.body.rewind
+  json = JSON.parse(request.body.read)
+  puts "-----------------------------------------------------------"
+end
+
 post '/fbwebhooks' do
   begin
     puts request.body.read
