@@ -20,6 +20,7 @@ class FacebookResponse
     if transaction_params = get_transaction_details
       transactions = GetTransactions.new(get_client, transaction_params).execute
       responses << format_transactions(transactions)
+      responses << text_response("You don't have any!") if transactions.empty?
     end
 
     if get_balance?
