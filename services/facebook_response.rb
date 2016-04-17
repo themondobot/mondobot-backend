@@ -100,7 +100,7 @@ class FacebookResponse
       element = {
         title: transaction.merchant.try(:name) || transaction.description,
         subtitle: transaction.amount.format,
-        image:  image.size == 0 ? image : 'https://getmondo.co.uk/static/images/mondo-mark-01.png'
+        image:  image.size != 0 ? image : 'https://getmondo.co.uk/static/images/mondo-mark-01.png'
       }
       transaction_tiles << create_element_for_list(element)
     end
@@ -192,14 +192,18 @@ class FacebookResponse
   end
 
   def get_transaction_details
-    return false unless message_words.include? "transactions"
+    latitude = attachment.try(:[], "payload").try(:[],"coordinates").try(:[], "lat")
+    longitude = attachment.try(:[], "payload").try(:[],"coordinates").try(:[], "long")
+    if latitude && longitude
+      return {
+        latitude: latitude,
+        longitude: longitude
+      }
+    end
+    return false if !message_words.include? "transactions"
     params = {}
     params[:date] = Date.yesterday if message_words.include? "yesterday"
     params[:date] = Date.today if message_words.include? "today"
-    unless attachment.nil?
-      params[:latitude] = attachment.try(:[], "payload").try(:[], "latitude")
-      params[:longitude] = attachment.try(:[], "payload").try(:[], "longitude")
-    end
 
     words = message_words
     words.delete("yesterday")
