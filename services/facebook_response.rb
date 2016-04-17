@@ -97,7 +97,7 @@ class FacebookResponse
       element = {
         title: transaction.merchant.try(:name) || transaction.description,
         subtitle: transaction.amount.format,
-        image:  image.size ? image : 'https://getmondo.co.uk/static/images/mondo-mark-01.png'
+        image:  image.size == 0 ? image : 'https://getmondo.co.uk/static/images/mondo-mark-01.png'
       }
       transaction_tiles << create_element_for_list(element)
     end
@@ -221,7 +221,7 @@ class FacebookResponse
   def get_client
     return @client if @client
     token = ENV['MONDO_ACCESS_TOKEN']
-    account_id = "acc_000097FqTUdHRQwns220cz"
+    account_id =  ENV['ACCOUNT_ID']
     @client = Mondo::Client.new(token: token, account_id: account_id)
     @client.api_url = "https://staging-api.gmon.io"
     @client
