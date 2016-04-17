@@ -104,10 +104,10 @@ class FacebookResponse
   def create_element_for_list(element)
     tile = {
       title: element[:title],
-      subtitle: element[:subtitle],
-      buttons: []
+      subtitle: element[:subtitle]
     }
     tile[:image_url] = element[:image] if element[:image]
+    tile[:buttons] if element[:buttons].to_a
     element[:buttons].to_a.each do |button|
       tile[:buttons] << {
           type: :web_url,
