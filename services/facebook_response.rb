@@ -94,7 +94,7 @@ class FacebookResponse
       element = {
         title: transaction.merchant.try(:name) || transaction.description,
         subtitle: transaction.amount.format,
-        image: transaction.merchant.try(:logo)
+        image: transaction.merchant.try(:logo) || 'https://getmondo.co.uk/static/images/mondo-mark-01.png'
       }
       transaction_tiles << create_element_for_list(element)
     end

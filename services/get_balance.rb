@@ -6,6 +6,6 @@ class GetBalance
   end
 
   def execute
-    @client.balance
+    Money.new(@client.balance.balance, @client.balance.currency)
   end
 end
