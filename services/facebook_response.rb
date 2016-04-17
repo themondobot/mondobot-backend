@@ -200,7 +200,10 @@ class FacebookResponse
         longitude: longitude
       }
     end
-    return false if !message_words.include? "transactions"
+
+    transaction_related = message_words.include?("transactions") || message_words.include?("spent")
+    return false unless transaction_related
+
     params = {}
     params[:date] = Date.yesterday if message_words.include? "yesterday"
     params[:date] = Date.today if message_words.include? "today"
