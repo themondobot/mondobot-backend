@@ -3,8 +3,11 @@ require 'unirest'
 class FacebookResponse
   attr_accessor :recipient, :message, :attachment
 
-  TEST_IMAGE = "https://45.media.tumblr.com/cfd039730669f89c064f69e57e0877af/tumblr_nj6ipiNACJ1t8s6eeo1_500.gif"
-
+  TEST_IMAGES = ["https://45.media.tumblr.com/cfd039730669f89c064f69e57e0877af/tumblr_nj6ipiNACJ1t8s6eeo1_500.gif",
+    "http://i.giphy.com/JpqnWRtJHhsu4.gif",
+    "http://i.giphy.com/iA8jqAN2GXSTe.gif",
+    "http://i.giphy.com/u3VHqg445lFC.gif"
+  ]
   def initialize(recipient, message: nil, attachments: nil)
     self.recipient = recipient
     self.message = message.to_s.downcase
@@ -36,7 +39,7 @@ class FacebookResponse
     end
 
     if responses.length < 1
-      responses << image_response(TEST_IMAGE)
+      responses << image_response(TEST_IMAGES.sample)
     end
 
     responses
@@ -180,7 +183,7 @@ class FacebookResponse
   end
 
   def greeting?
-    ["hello", "hey", "sup", "lo", "hi"].each do |greeting|
+    ["hello", "hey", "sup", "lo", "hi", "hola", "wagwan", "hiya"].each do |greeting|
       if message_words.include?(greeting)
         return true
       end
