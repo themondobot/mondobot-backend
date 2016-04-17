@@ -156,9 +156,12 @@ class FacebookResponse
   end
 
   def authorized?
-    user = User.find_by(facebook_token: facebook_token)
-    return false unless user.present?
-    user.mondo_token.present?
+    # user = User.find_by(facebook_token: facebook_token)
+    # return false unless user.present?
+    # user.mondo_token.present?
+
+    # TODO: to enable auth, delete this line and uncomment the rest
+    true
   end
 
   def facebook_token
