@@ -26,10 +26,6 @@ get "/users" do
   @users.to_json
 end
 
-get "/balance" do
-  FacebookResponse.new(nil, message: "transactions yesterday").send!
-end
-
 get "/mondo_callback" do
   puts "MONDO CALLBACK --------------------------------------------"
   puts request.body.read

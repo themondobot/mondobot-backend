@@ -24,6 +24,8 @@ class FacebookResponse
       transactions = GetTransactions.new(get_client, transaction_params).execute
       responses << format_transactions(transactions)
       responses << text_response("You don't have any!") if transactions.empty?
+      sum = Money.new(get_total_amount_of_money(transactions), "GBP")
+      responses << text_response("You have spent #{sum.format} in total") if transactions.any?
     end
 
     if get_balance?
@@ -226,6 +228,15 @@ class FacebookResponse
 
   def message_handler
     @handler ||= MessageHandler.new
+  end
+
+  def get_total_amount_of_money(transactions)
+    sum = 0
+    transactions.each do |transaction|
+      next if transaction.amount.fractional > 0.0
+      sum += transaction.amount.fractional
+    end
+    sum.abs
   end
 
   def get_client
