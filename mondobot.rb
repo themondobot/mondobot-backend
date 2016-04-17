@@ -56,6 +56,11 @@ post '/fbwebhooks' do
 
     status 201
     body ''
+  rescue => e
+    puts e
+    puts e.backtrace
+    status 201
+    body ''
   end
 end
 
